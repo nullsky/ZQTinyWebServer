@@ -7,6 +7,7 @@
 
 #include <netinet/in.h>
 #include <string>
+#include <mysql.h>
 
 class HttpConn {
 public:
@@ -55,6 +56,9 @@ public:
     bool read_once();
     bool write();
 
+    sockaddr_in *get_address() {
+        return &address_;
+    };
     void init_mysql_result();
     int time_flag;
     int improv;
@@ -71,7 +75,39 @@ private:
     LINE_STATUS parse_line();
     void unmap();
 
-    bool add_response()
+    bool add_headers(int content_length);
+    bool add_status_line(int status, const char *title);
+    bool add_response(const char *format, ...);
+    bool add_content(const char *content);
+    bool add_content_type();
+    bool add_linger();
+    bool add_blank_line();
+
+public:
+    static int epollfd_;
+    static int user_count_;
+    MYSQL *mysql_;
+    int state_; // 0:读 1:写
+
+private:
+    int sockfd_;
+    sockaddr_in address_;
+    char read_buf_[READ_BUF_SIZE];
+    int read_idx_;
+    int check_idx_;
+    int start_line_;
+    char write_buf_[WRITE_BUF_SZIE];
+    int wirte_idx_;
+    CHECK_STATE check_state_;
+    METHOD method_;
+
+    char real_file_[FILE_NAME_LENGTH];
+    char *url_;
+    char *version_;
+    char *host_;
+    int content_length_;
+    bool linger_;
+
 };
 
 
