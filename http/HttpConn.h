@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <string>
 #include <mysql.h>
+#include <sys/stat.h>
+#include <map>
 
 class HttpConn {
 public:
@@ -107,6 +109,23 @@ private:
     char *host_;
     int content_length_;
     bool linger_;
+
+    char *file_address_;
+    struct stat file_stat_; // 文件属性信息
+    struct iovec iv_[2];    // 向量元素
+    int iv_count_;
+    int cgi_; // 是否启用post
+    char *request_header_;
+    int byte_to_send_;
+    char *doc_root_;
+
+    std::map<std::string, std::string> users_;
+    int m_TRIGMode;
+    int m_close_log;
+
+    char sql_user[100];
+    char sql_passwd[100];
+    char sql_name[100];
 
 };
 
